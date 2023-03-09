@@ -2,24 +2,35 @@ package main
 
 import (
 	"fmt"
+	"github.com/Masterminds/semver"
 	"go/build"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 
-	"github.com/jessevdk/go-flags"
-
 	"github.com/denisdubovitskiy/ifacemaker/generator"
+	"github.com/jessevdk/go-flags"
 )
 
 type arguments struct {
 	SourcePackage  string `short:"s" long:"source-pkg" description:"Go import path to struct" required:"true"`
+	ModulePath     string `short:"m" long:"module-path" description:"Submodule path from the root" required:"false"`
 	ResultPackage  string `short:"p" long:"result-pkg" description:"Result package name" required:"true"`
 	StructName     string `short:"t" long:"struct-name" description:"A structure name to generate interface for" required:"true"`
 	InterfaceName  string `short:"i" long:"interface-name" description:"Name of the generated interface" required:"true"`
 	OutputFileName string `short:"o" long:"output" description:"OutputFileName file name" required:"true"`
 }
+
+// --source-pkg github.com/mattermost/mattermost-server/v5 \
+// --result-pkg mattermost \
+// --struct-name Audit \
+// --module-path model \
+// --interface-name Audit \
+// --output mattermost/audit.go
 
 // --source-pkg github.com/hashicorp/vault@v1.8.2/api.Client \
 // --result-pkg vault \
@@ -40,12 +51,24 @@ func main() {
 	gopath := parseGopath()
 	gomod := filepath.Join(gopath, "pkg", "mod")
 
-	module, err := parsePackage(args.SourcePackage)
+	module, err := parseModule(args.SourcePackage)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	directory := filepath.Join(gomod, module.Directory())
+	version := module.Version
+	if version == "" {
+		directory := filepath.Join(gomod, module.Name)
+		dirs, err := os.ReadDir(directory)
+		if err != nil {
+			log.Fatalf("trying to determine a last version, reading %s: %v", directory, err)
+		}
+		versions := encodeDirsToStrings(dirs)
+		sortVersions(versions)
+		version = versions[0]
+	}
+
+	directory := filepath.Join(gomod, module.Name, version, args.ModulePath)
 
 	files, err := findSourceFiles(directory)
 	if err != nil {
@@ -61,7 +84,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	if err := os.MkdirAll(filepath.Dir(args.OutputFileName), 0644); err != nil {
+	if err := os.MkdirAll(filepath.Dir(args.OutputFileName), os.ModePerm); err != nil {
 		log.Fatal(err.Error())
 	}
 	if err := os.WriteFile(args.OutputFileName, generatedCode, 0644); err != nil {
@@ -69,51 +92,53 @@ func main() {
 	}
 }
 
+func encodeDirsToStrings(dirs []os.DirEntry) []string {
+	result := make([]string, len(dirs))
+	for i, d := range dirs {
+		result[i] = d.Name()
+	}
+	return result
+}
+
 type sourcePackage struct {
-	Name    string
-	Version string
-	Struct  string
-	Path    string
+	Name         string
+	Version      string
+	MajorVersion string
 }
 
-func (s *sourcePackage) Directory() string {
-	return filepath.Join(s.Name, s.Path+"@"+s.Version)
-}
+func parseModule(p string) (*sourcePackage, error) {
+	version := ""
+	module := p
 
-func parsePackage(p string) (*sourcePackage, error) {
-	if !strings.Contains(p, "@") {
-		return nil, fmt.Errorf("validation error: struct spec should contain @")
+	if strings.Contains(p, "@") {
+		parts := strings.Split(p, "@")
+		version = parts[1]
+		if !strings.HasPrefix(version, "v") {
+			return nil, fmt.Errorf("validation error: version should start with v")
+		}
+
+		module = parts[0]
 	}
 
-	if strings.Count(p, "@") > 1 {
-		return nil, fmt.Errorf("validation error: struct spec should contain single @")
+	majorVersion := ""
+
+	// module has major version
+	if lastSlash := strings.LastIndex(module, "/"); lastSlash > -1 {
+		major := module[lastSlash+1:]
+		matched, err := regexp.MatchString(`^v\d+$`, major)
+		if err != nil {
+			return nil, fmt.Errorf("major version check failed: %s - %v", major, err)
+		}
+		if matched {
+			majorVersion = major
+			module = module[:lastSlash]
+		}
 	}
-
-	atIndex := strings.LastIndex(p, "@")
-	module := p[:atIndex]
-
-	rightPart := p[atIndex+1:]
-
-	if !strings.HasPrefix(rightPart, "v") {
-		return nil, fmt.Errorf("validation error: version should start with v")
-	}
-
-	firstSlashIdx := strings.Index(rightPart, "/")
-	if firstSlashIdx < 0 {
-		return nil, fmt.Errorf("validation error: there must")
-	}
-
-	version := rightPart[:firstSlashIdx]
-
-	rightPart = rightPart[firstSlashIdx+1:]
-	lastDotIdx := strings.LastIndex(rightPart, ".")
-	structName := rightPart[lastDotIdx+1:]
 
 	return &sourcePackage{
-		Name:    module,
-		Struct:  structName,
-		Version: version,
-		Path:    rightPart[:lastDotIdx],
+		Name:         module,
+		Version:      version,
+		MajorVersion: majorVersion,
 	}, nil
 }
 
@@ -147,4 +172,44 @@ func findSourceFiles(directory string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+type versionDirectory struct {
+	major   int
+	version *semver.Version
+}
+
+func parseVersionDirectory(v string) versionDirectory {
+	var (
+		major   int
+		version string
+	)
+
+	if strings.Contains(v, "@") {
+		atIdx := strings.Index(v, "@")
+		version = v[atIdx+1:]
+		majorStr := v[1:atIdx]
+		major, _ = strconv.Atoi(majorStr)
+	}
+
+	sem := semver.MustParse(version)
+
+	return versionDirectory{
+		major:   major,
+		version: sem,
+	}
+}
+
+func sortVersions(versions []string) {
+	sort.Slice(versions, func(i, j int) bool {
+		return compareTwoVersions(parseVersionDirectory(versions[i]), parseVersionDirectory(versions[j]))
+	})
+}
+
+func compareTwoVersions(v1, v2 versionDirectory) bool {
+	if v1.major > v2.major {
+		return true
+	}
+
+	return v1.version.GreaterThan(v2.version)
 }
