@@ -1,4 +1,4 @@
-module github.com/densdubovitskiy/ifacemaker
+module github.com/denisdubovitskiy/ifacemaker
 
 go 1.19
 

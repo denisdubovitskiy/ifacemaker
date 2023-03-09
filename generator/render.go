@@ -19,7 +19,7 @@ func RenderInterface(
 	// generated comment
 	b.WriteString("// Package ")
 	b.WriteString(packageName)
-	b.WriteString(" generated with github.com/densdubovitskiy/ifacemaker, DO NOT EDIT.\n")
+	b.WriteString(" generated with github.com/denisdubovitskiy/ifacemaker, DO NOT EDIT.\n")
 
 	// header
 	b.WriteString("package ")
