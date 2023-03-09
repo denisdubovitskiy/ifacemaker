@@ -1,55 +1,26 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Masterminds/semver"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
-
-func TestParseVersionDirectory(t *testing.T) {
-	cases := []struct {
-		given string
-		want  versionDirectory
-	}{
-		{
-			given: "v5@v5.39.3",
-			want: versionDirectory{
-				major:   5,
-				version: semver.MustParse("v5.39.3"),
-			},
-		},
-		{
-			given: "v0.1.0",
-			want: versionDirectory{
-				major:   0,
-				version: semver.MustParse("v0.1.0"),
-			},
-		},
-	}
-
-	for _, tc := range cases {
-		tc := tc
-		t.Run(tc.given, func(t *testing.T) {
-			t.Parallel()
-
-			parseVersionDirectory(tc.given)
-		})
-	}
-}
 
 func TestSortVersions(t *testing.T) {
 	cases := []struct {
-		given []string
-		want  []string
+		given []*semver.Version
+		want  []*semver.Version
 	}{
 		{
-			given: []string{
-				"v5@v5.39.2",
-				"v5@v5.39.3",
+			given: []*semver.Version{
+				semver.MustParse("v5@v5.39.2"),
+				semver.MustParse("v5@v5.39.3"),
 			},
-			want: []string{
-				"v5@v5.39.3",
-				"v5@v5.39.2",
+			want: []*semver.Version{
+				semver.MustParse("v5@v5.39.3"),
+				semver.MustParse("v5@v5.39.2"),
 			},
 		},
 	}
@@ -63,6 +34,33 @@ func TestSortVersions(t *testing.T) {
 			sortVersions(tc.given)
 
 			require.Equal(t, tc.want, tc.given)
+		})
+	}
+}
+
+func TestParseModule(t *testing.T) {
+	cases := []struct {
+		name    string
+		version string
+		want    *sourcePackage
+	}{
+		{
+			name:    "github.com/mattermost/mattermost-server/v5",
+			version: "",
+			want: &sourcePackage{
+				Name: "github.com/mattermost/mattermost-server",
+				Base: "mattermost-server",
+				Dir:  "github.com/mattermost/mattermost-server",
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			mod, err := parseModule(tc.name, "")
+
+			require.NoError(t, err)
+			fmt.Println(mod)
 		})
 	}
 }

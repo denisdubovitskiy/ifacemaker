@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"github.com/denisdubovitskiy/ifacemaker/internal/gopath"
+	"github.com/denisdubovitskiy/ifacemaker/internal/golang"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -532,14 +532,14 @@ type Client interface {
 		},
 	}
 
-	modpath := filepath.Join(gopath.Find(), "pkg", "mod")
+	modpath := filepath.Join(golang.GOPATH(), "pkg", "mod")
 
 	for _, tc := range cases {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
 			cmd := exec.Command("go", "get", tc.module)
-			cmd.Env = append(os.Environ(), "GOPATH="+gopath.Find())
+			cmd.Env = append(os.Environ(), "GOPATH="+golang.GOPATH())
 			out, err := cmd.CombinedOutput()
 			require.NoErrorf(t, err, "cmd output: %s", string(out))
 
