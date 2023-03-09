@@ -10,7 +10,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 
-	"github.com/densdubovitskiy/interfacegen/generator"
+	"github.com/densdubovitskiy/ifacemaker/generator"
 )
 
 type arguments struct {
