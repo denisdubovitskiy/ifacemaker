@@ -13,6 +13,7 @@ const (
 	TypeKindEllipsis = "ellipsis"
 	TypeKindArray    = "array"
 	TypeKindFunc     = "func"
+	TypeKindMap      = "map"
 )
 
 type Type struct {
@@ -24,6 +25,10 @@ type Type struct {
 	// For function parameters only
 	Results []*Param
 	Params  []*Param
+
+	// For maps only
+	mapKeyType string
+	mapValType string
 }
 
 func (t *Type) String() string {
@@ -39,6 +44,8 @@ func (t *Type) String() string {
 		return fmt.Sprintf("...%s", t.Child.String())
 	case TypeKindArray:
 		return fmt.Sprintf("[]%s", t.Child.String())
+	case TypeKindMap:
+		return fmt.Sprintf("map[%s]%s", t.mapKeyType, t.mapValType)
 	case TypeKindSelector:
 		return fmt.Sprintf("%s.%s", t.Package, t.Name)
 	case TypeKindFunc:
@@ -114,6 +121,12 @@ func ParseType(
 		return &Type{
 			Child: ParseType(paramType.Elt, typesMap, sourcePackageName),
 			Kind:  TypeKindArray,
+		}
+	case *ast.MapType:
+		return &Type{
+			Kind:       TypeKindMap,
+			mapKeyType: paramType.Key.(*ast.Ident).Name,
+			mapValType: paramType.Value.(*ast.Ident).Name,
 		}
 	default:
 		panic("unhandled type")

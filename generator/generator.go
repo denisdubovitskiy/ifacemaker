@@ -67,16 +67,11 @@ func Generate(options Options) ([]byte, error) {
 		receivers = append(receivers, fileReceivers...)
 	}
 
-	result, err := RenderInterface(
+	return RenderInterface(
 		options.OutputPackageName,
 		options.InterfaceName,
 		receivers,
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
 }
 
 func parseInterfaceDoc(parsed *ast.File, structName string) string {

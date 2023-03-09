@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/Masterminds/semver"
-	"go/build"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,7 +10,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Masterminds/semver"
 	"github.com/denisdubovitskiy/ifacemaker/generator"
+	"github.com/denisdubovitskiy/ifacemaker/gopath"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -48,8 +48,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	gopath := parseGopath()
-	gomod := filepath.Join(gopath, "pkg", "mod")
+	gomod := filepath.Join(gopath.Find(), "pkg", "mod")
 
 	module, err := parseModule(args.SourcePackage)
 	if err != nil {
@@ -71,6 +70,9 @@ func main() {
 	directory := filepath.Join(gomod, module.Name, version, args.ModulePath)
 
 	files, err := findSourceFiles(directory)
+	for _, f := range files {
+		fmt.Println(f)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -142,38 +144,6 @@ func parseModule(p string) (*sourcePackage, error) {
 	}, nil
 }
 
-func parseGopath() string {
-	if gopath := os.Getenv("GOPATH"); gopath != "" {
-		return gopath
-	}
-
-	return build.Default.GOPATH
-}
-
-func findSourceFiles(directory string) ([]string, error) {
-	var files []string
-
-	entries, err := os.ReadDir(directory)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-
-		if strings.HasSuffix(e.Name(), "_test.go") ||
-			!strings.HasSuffix(e.Name(), ".go") {
-			continue
-		}
-
-		files = append(files, filepath.Join(directory, e.Name()))
-	}
-
-	return files, nil
-}
-
 type versionDirectory struct {
 	major   int
 	version *semver.Version
@@ -212,4 +182,28 @@ func compareTwoVersions(v1, v2 versionDirectory) bool {
 	}
 
 	return v1.version.GreaterThan(v2.version)
+}
+
+func findSourceFiles(directory string) ([]string, error) {
+	var files []string
+
+	entries, err := os.ReadDir(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+
+		if strings.HasSuffix(e.Name(), "_test.go") ||
+			!strings.HasSuffix(e.Name(), ".go") {
+			continue
+		}
+
+		files = append(files, filepath.Join(directory, e.Name()))
+	}
+
+	return files, nil
 }
