@@ -70,9 +70,6 @@ func main() {
 	directory := filepath.Join(gomod, module.Name, version, args.ModulePath)
 
 	files, err := findSourceFiles(directory)
-	for _, f := range files {
-		fmt.Println(f)
-	}
 	if err != nil {
 		log.Fatal(err)
 	}
