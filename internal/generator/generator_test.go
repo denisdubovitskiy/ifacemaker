@@ -1,12 +1,12 @@
 package generator
 
 import (
+	"github.com/denisdubovitskiy/ifacemaker/internal/gopath"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
 
-	"github.com/denisdubovitskiy/ifacemaker/gopath"
 	"github.com/stretchr/testify/require"
 )
 

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/denisdubovitskiy/ifacemaker/internal/generator"
+	"github.com/denisdubovitskiy/ifacemaker/internal/gopath"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,8 +13,6 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver"
-	"github.com/denisdubovitskiy/ifacemaker/generator"
-	"github.com/denisdubovitskiy/ifacemaker/gopath"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -115,7 +115,6 @@ func parseModule(p string) (*sourcePackage, error) {
 		if !strings.HasPrefix(version, "v") {
 			return nil, fmt.Errorf("validation error: version should start with v")
 		}
-
 		module = parts[0]
 	}
 
