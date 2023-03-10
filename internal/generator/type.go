@@ -7,13 +7,14 @@ import (
 )
 
 const (
-	TypeKindSelector = "selector"
-	TypeKindStar     = "star"
-	TypeKindIdent    = "ident"
-	TypeKindEllipsis = "ellipsis"
-	TypeKindArray    = "array"
-	TypeKindFunc     = "func"
-	TypeKindMap      = "map"
+	TypeKindSelector  = "selector"
+	TypeKindStar      = "star"
+	TypeKindIdent     = "ident"
+	TypeKindEllipsis  = "ellipsis"
+	TypeKindArray     = "array"
+	TypeKindFunc      = "func"
+	TypeKindMap       = "map"
+	TypeKindInterface = "interface"
 )
 
 type Type struct {
@@ -27,8 +28,8 @@ type Type struct {
 	Params  []*Param
 
 	// For maps only
-	mapKeyType string
-	mapValType string
+	mapKeyType *Type
+	mapValType *Type
 }
 
 func (t *Type) String() string {
@@ -45,9 +46,11 @@ func (t *Type) String() string {
 	case TypeKindArray:
 		return fmt.Sprintf("[]%s", t.Child.String())
 	case TypeKindMap:
-		return fmt.Sprintf("map[%s]%s", t.mapKeyType, t.mapValType)
+		return fmt.Sprintf("map[%s]%s", t.mapKeyType.String(), t.mapValType.String())
 	case TypeKindSelector:
 		return fmt.Sprintf("%s.%s", t.Package, t.Name)
+	case TypeKindInterface:
+		return "interface{}"
 	case TypeKindFunc:
 		params := make([]string, len(t.Params))
 		for i, p := range t.Params {
@@ -125,8 +128,12 @@ func ParseType(
 	case *ast.MapType:
 		return &Type{
 			Kind:       TypeKindMap,
-			mapKeyType: paramType.Key.(*ast.Ident).Name,
-			mapValType: paramType.Value.(*ast.Ident).Name,
+			mapKeyType: ParseType(paramType.Key, typesMap, sourcePackageName),
+			mapValType: ParseType(paramType.Value, typesMap, sourcePackageName),
+		}
+	case *ast.InterfaceType:
+		return &Type{
+			Kind: TypeKindInterface,
 		}
 	default:
 		panic("unhandled type")
