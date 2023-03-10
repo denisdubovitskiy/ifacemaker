@@ -138,8 +138,6 @@ func ParseType(
 	default:
 		panic("unhandled type")
 	}
-
-	return nil
 }
 
 func parseTypesFromFile(fileAst *ast.File) []string {

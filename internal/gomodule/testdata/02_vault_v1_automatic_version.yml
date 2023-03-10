@@ -1,0 +1,19 @@
+given:
+  name: "github.com/hashicorp/vault/api"
+
+want:
+  directory: "/path/to/modcache/github.com/hashicorp/vault/api@v1.8.2"
+  version_directory: "api@v1.8.2"
+  module:
+    name: "github.com/hashicorp/vault/api"
+    base: "api"
+    dir: "github.com/hashicorp/vault"
+    ver: "v1.8.2"
+
+mock:
+  gomodcache: "/path/to/modcache"
+  goroot: "/path/to/goroot"
+  dirs:
+    - "github.com/hashicorp/vault/api@v1.8.0"
+    - "github.com/hashicorp/vault/api@v1.8.1"
+    - "github.com/hashicorp/vault/api@v1.8.2"

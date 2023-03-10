@@ -1,0 +1,11 @@
+given:
+  name: "net/http"
+
+want:
+  directory: "/path/to/goroot/src/net/http"
+  module:
+    name: "net/http"
+
+mock:
+  gomodcache: "/path/to/modcache"
+  goroot: "/path/to/goroot"

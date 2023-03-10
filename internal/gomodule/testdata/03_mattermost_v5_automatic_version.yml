@@ -1,0 +1,19 @@
+given:
+  name: "github.com/mattermost/mattermost-server/v5"
+
+want:
+  directory: "/path/to/modcache/github.com/mattermost/mattermost-server/v5@v5.39.3"
+  version_directory: "v5@v5.39.3"
+  module:
+    name: "github.com/mattermost/mattermost-server"
+    base: "mattermost-server"
+    dir: "github.com/mattermost/mattermost-server"
+    ver: "v5.39.3"
+
+mock:
+  gomodcache: "/path/to/modcache"
+  goroot: "/path/to/goroot"
+  dirs:
+    - "github.com/mattermost/mattermost-server/v5@v5.39.1"
+    - "github.com/mattermost/mattermost-server/v5@v5.39.2"
+    - "github.com/mattermost/mattermost-server/v5@v5.39.3"
