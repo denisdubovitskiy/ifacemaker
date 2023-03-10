@@ -116,6 +116,17 @@ func parseModule(modulePath, versionStr string) (*sourcePackage, error) {
 		return &sourcePackage{Name: modulePath}, nil
 	}
 
+	if versionStr == "" {
+		if strings.Contains(modulePath, "@") {
+			parts := strings.Split(modulePath, "@")
+			versionStr = parts[1]
+			if !strings.HasPrefix(versionStr, "v") {
+				return nil, fmt.Errorf("validation error: version should start with v")
+			}
+			modulePath = parts[0]
+		}
+	}
+
 	var version *semver.Version
 	module := modulePath
 
@@ -132,17 +143,6 @@ func parseModule(modulePath, versionStr string) (*sourcePackage, error) {
 		majorVersion = moduleBase
 		module = moduleDir
 		moduleBase = filepath.Base(module)
-	}
-
-	if versionStr == "" {
-		if strings.Contains(modulePath, "@") {
-			parts := strings.Split(modulePath, "@")
-			versionStr = parts[1]
-			if !strings.HasPrefix(versionStr, "v") {
-				return nil, fmt.Errorf("validation error: version should start with v")
-			}
-			module = parts[0]
-		}
 	}
 
 	if versionStr == "" {
@@ -173,6 +173,8 @@ func parseModule(modulePath, versionStr string) (*sourcePackage, error) {
 
 		sortVersions(versions)
 		version = versions[0]
+	} else {
+		version = semver.MustParse(versionStr)
 	}
 
 	return &sourcePackage{
