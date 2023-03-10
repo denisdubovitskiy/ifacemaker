@@ -1,0 +1,6 @@
+// Package audit generated with github.com/denisdubovitskiy/ifacemaker, DO NOT EDIT.
+package audit
+
+type Audit interface {
+	ToJson() string
+}
