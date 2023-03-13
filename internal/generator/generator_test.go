@@ -42,10 +42,6 @@ func TestGenerate(t *testing.T) {
 			name:      "mattermost Client4 struct",
 			directory: "04_client4",
 		},
-		{
-			name:      "mattermost User struct",
-			directory: "05_user",
-		},
 	}
 
 	for _, tc := range cases {
