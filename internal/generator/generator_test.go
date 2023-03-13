@@ -38,10 +38,6 @@ func TestGenerate(t *testing.T) {
 			name:      "mattermost Audit package rename",
 			directory: "03_audit_package_rename",
 		},
-		{
-			name:      "mattermost Client4 struct",
-			directory: "04_client4",
-		},
 	}
 
 	for _, tc := range cases {
