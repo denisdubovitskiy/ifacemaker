@@ -1,0 +1,5 @@
+module: "github.com/mattermost/mattermost-server/v5@v5.39.3"
+struct_name: "User"
+interface_name: "User"
+out_package_name: "user"
+module_path: "model"

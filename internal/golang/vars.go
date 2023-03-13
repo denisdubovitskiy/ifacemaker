@@ -23,5 +23,8 @@ func GOROOT() string {
 }
 
 func GOMODCACHE() string {
+	if modcache := os.Getenv("GOMODCACHE"); modcache != "" {
+		return modcache
+	}
 	return filepath.Join(GOPATH(), "pkg", "mod")
 }

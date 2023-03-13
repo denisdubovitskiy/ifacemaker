@@ -1,0 +1,5 @@
+module: "github.com/mattermost/mattermost-server/v5@v5.39.3"
+struct_name: "Client4"
+interface_name: "Client4"
+out_package_name: "client"
+module_path: "model"

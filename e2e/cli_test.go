@@ -1,4 +1,4 @@
-package generator
+package e2e
 
 import (
 	"os"
@@ -16,11 +16,26 @@ type testCase struct {
 	StructName     string   `yaml:"struct_name"`
 	InterfaceName  string   `yaml:"interface_name"`
 	OutPackageName string   `yaml:"out_package_name"`
+	ModulePath     string   `yaml:"module_path"`
 }
 
-func TestGenerate(t *testing.T) {
+func TestBinary(t *testing.T) {
 	wd, _ := os.Getwd()
 	modcache := filepath.Join(wd, ".modcache")
+
+	path := "../cmd/ifacemaker/main.go"
+	binary := filepath.Join(wd, "ifacemaker")
+
+	// 1. build binary
+	cmd := exec.Command("go", "build", "-o", binary, path)
+	_, err := cmd.CombinedOutput()
+	require.NoErrorf(t, err, "unable to build binary")
+
+	// 2. defer cleanup binary
+	t.Cleanup(func() {
+		err := os.Remove(binary)
+		require.NoErrorf(t, err, "unable to remove binary")
+	})
 
 	cases := []struct {
 		name      string
@@ -54,23 +69,33 @@ func TestGenerate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			spec := testReadFile(t, tc.directory, "case.yml")
+			spec := testReadFile(t, filepath.Join("testdata", tc.directory, "case.yml"))
 			var test testCase
 			testUnmarshalYaml(t, spec, &test)
 			testGetPackage(t, test.Module, modcache)
-			want := testReadFileString(t, tc.directory, "out.txt")
+			want := testReadFileString(t, filepath.Join("testdata", tc.directory, "out.txt"))
 
-			// act
-			got, err := Generate(Options{
-				Files:             encodeFiles(test.Files, modcache),
-				StructName:        test.StructName,
-				InterfaceName:     test.InterfaceName,
-				OutputPackageName: test.OutPackageName,
+			cmd := exec.Command(binary,
+				"--source-pkg", test.Module,
+				"--module-path", test.ModulePath,
+				"--result-pkg", test.OutPackageName,
+				"--struct-name", test.StructName,
+				"--interface-name", test.InterfaceName,
+				"--output", tc.directory+".txt",
+			)
+			cmd.Env = append(os.Environ(), "GOMODCACHE="+modcache)
+			out, err := cmd.CombinedOutput()
+			require.NoErrorf(t, err, "cmd output: %s", string(out))
+			t.Cleanup(func() {
+				err := os.Remove(tc.directory + ".txt")
+				require.NoError(t, err)
 			})
+
+			got := testReadFileString(t, tc.directory+".txt")
 
 			// assert
 			require.NoError(t, err)
-			require.Equal(t, want, string(got))
+			require.Equal(t, want, got)
 		})
 	}
 }
@@ -83,16 +108,16 @@ func encodeFiles(files []string, modpath string) []string {
 	return result
 }
 
-func testReadFile(t *testing.T, directory, file string) []byte {
+func testReadFile(t *testing.T, file string) []byte {
 	t.Helper()
-	content, err := os.ReadFile(filepath.Join("testdata", directory, file))
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 	return content
 }
 
-func testReadFileString(t *testing.T, directory, file string) string {
+func testReadFileString(t *testing.T, file string) string {
 	t.Helper()
-	return string(testReadFile(t, directory, file))
+	return string(testReadFile(t, file))
 }
 
 func testGetPackage(t *testing.T, module, modcache string) {

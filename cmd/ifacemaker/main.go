@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/afero"
+
 	"github.com/denisdubovitskiy/ifacemaker/internal/generator"
 	"github.com/denisdubovitskiy/ifacemaker/internal/gomodule"
 	"github.com/jessevdk/go-flags"
@@ -21,18 +23,15 @@ type arguments struct {
 	OutputFileName string `short:"o" long:"output" description:"OutputFileName file name" required:"true"`
 }
 
-// --source-pkg github.com/mattermost/mattermost-server/v5 \
-// --result-pkg mattermost \
-// --struct-name Audit \
+// ifacemaker \
+// --source-pkg \
+// github.com/mattermost/mattermost-server/v5@v5.39.3 \
 // --module-path model \
-// --interface-name Audit \
-// --output mattermost/audit.go
+// --result-pkg client \
+// --struct-name Client4 \
+// --interface-name Client4 \
+// --output mattermost/client.go
 
-// --source-pkg github.com/hashicorp/vault@v1.8.2/api.Client \
-// --result-pkg vault \
-// --struct-name Client \
-// --interface-name Client \
-// --output result/vault/client.go
 func main() {
 	var args arguments
 
@@ -71,10 +70,18 @@ func main() {
 	}
 }
 
-func findSourceFiles(directory string) ([]string, error) {
+func newSourceFilesFinder() *sourceFilesFinder {
+	return &sourceFilesFinder{fs: afero.NewOsFs()}
+}
+
+type sourceFilesFinder struct {
+	fs afero.Fs
+}
+
+func (f *sourceFilesFinder) findSourceFiles(directory string) ([]string, error) {
 	var files []string
 
-	entries, err := os.ReadDir(directory)
+	entries, err := afero.ReadDir(f.fs, directory)
 	if err != nil {
 		return nil, err
 	}
@@ -94,3 +101,5 @@ func findSourceFiles(directory string) ([]string, error) {
 
 	return files, nil
 }
+
+var findSourceFiles = newSourceFilesFinder().findSourceFiles

@@ -1,0 +1,5 @@
+module: "github.com/mattermost/mattermost-server/v5@v5.39.3"
+struct_name: "Audit"
+interface_name: "Audit2"
+out_package_name: "audit"
+module_path: "model"
