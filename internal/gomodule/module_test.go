@@ -64,12 +64,12 @@ func TestSortVersions(t *testing.T) {
 	}{
 		{
 			given: []*semver.Version{
-				semver.MustParse("v5@v5.39.2"),
-				semver.MustParse("v5@v5.39.3"),
+				semver.MustParse("v5.39.2"),
+				semver.MustParse("v5.39.3"),
 			},
 			want: []*semver.Version{
-				semver.MustParse("v5@v5.39.3"),
-				semver.MustParse("v5@v5.39.2"),
+				semver.MustParse("v5.39.3"),
+				semver.MustParse("v5.39.2"),
 			},
 		},
 	}
