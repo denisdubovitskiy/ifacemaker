@@ -1,16 +1,16 @@
 package main
 
 import (
+	"github.com/denisdubovitskiy/ifacemaker/internal/golang"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/afero"
-
 	"github.com/denisdubovitskiy/ifacemaker/internal/generator"
 	"github.com/denisdubovitskiy/ifacemaker/internal/gomodule"
 	"github.com/jessevdk/go-flags"
+	"github.com/spf13/afero"
 )
 
 type arguments struct {
@@ -20,7 +20,7 @@ type arguments struct {
 	ResultPackage  string `short:"p" long:"result-pkg" description:"Result package name" required:"true"`
 	StructName     string `short:"t" long:"struct-name" description:"A structure name to generate interface for" required:"true"`
 	InterfaceName  string `short:"i" long:"interface-name" description:"Name of the generated interface" required:"true"`
-	OutputFileName string `short:"o" long:"output" description:"OutputFileName file name" required:"true"`
+	OutputFileName string `short:"o" long:"output" description:"OutputFileName file name"`
 }
 
 // ifacemaker \
@@ -43,6 +43,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// gets passed when executed as `go generate`
+	if gofile := golang.GOFILE(); len(gofile) > 0 {
+		args.OutputFileName = gofile
+	}
+
 	module, err := gomodule.Parse(args.SourcePackage, args.SourceVersion)
 	if err != nil {
 		log.Fatal(err)
@@ -58,6 +63,8 @@ func main() {
 		StructName:        args.StructName,
 		OutputPackageName: args.ResultPackage,
 		InterfaceName:     args.InterfaceName,
+		ModulePath:        args.ModulePath,
+		SourcePackage:     args.SourcePackage,
 	})
 	if err != nil {
 		log.Fatal(err.Error())

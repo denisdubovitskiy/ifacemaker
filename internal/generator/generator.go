@@ -12,6 +12,8 @@ type Options struct {
 	StructName        string
 	InterfaceName     string
 	OutputPackageName string
+	ModulePath        string
+	SourcePackage     string
 }
 
 func Generate(options Options) ([]byte, error) {
@@ -70,6 +72,9 @@ func Generate(options Options) ([]byte, error) {
 	return RenderInterface(
 		options.OutputPackageName,
 		options.InterfaceName,
+		options.StructName,
+		options.SourcePackage,
+		options.ModulePath,
 		receivers,
 	)
 }

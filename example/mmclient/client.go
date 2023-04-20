@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/mattermost/mattermost-server/v5/model"
 )
 
 //go:generate ifacemaker --source-pkg github.com/mattermost/mattermost-server/v5@v5.39.3 --module-path model --result-pkg client --struct-name Client4 --interface-name Client4

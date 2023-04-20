@@ -1,6 +1,7 @@
 // Package audit generated with github.com/denisdubovitskiy/ifacemaker, DO NOT EDIT.
 package audit
 
+//go:generate ifacemaker --source-pkg github.com/mattermost/mattermost-server/v5@v5.39.3 --module-path model --result-pkg audit --struct-name Audit --interface-name Audit
 type Audit interface {
 	ToJson() string
 }

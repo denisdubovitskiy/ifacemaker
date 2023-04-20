@@ -1,6 +1,7 @@
 // Package user generated with github.com/denisdubovitskiy/ifacemaker, DO NOT EDIT.
 package user
 
+//go:generate ifacemaker --source-pkg github.com/mattermost/mattermost-server/v5@v5.39.3 --module-path model --result-pkg user --struct-name User --interface-name User
 type User interface {
 	DeepCopy() *model.User
 	// IsValid validates the user and returns an error if it isn't configured

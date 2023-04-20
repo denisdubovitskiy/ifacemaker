@@ -9,6 +9,9 @@ import (
 func RenderInterface(
 	packageName string,
 	interfaceName string,
+	sourceStructName string,
+	sourcePkgName string,
+	modulePath string,
 	receivers []Receiver,
 ) (
 	[]byte,
@@ -24,6 +27,19 @@ func RenderInterface(
 	// header
 	b.WriteString("package ")
 	b.WriteString(packageName)
+	b.WriteString("\n")
+
+	b.WriteString("//go:generate ifacemaker")
+	b.WriteString(" --source-pkg ")
+	b.WriteString(sourcePkgName)
+	b.WriteString(" --module-path ")
+	b.WriteString(modulePath)
+	b.WriteString(" --result-pkg ")
+	b.WriteString(packageName)
+	b.WriteString(" --struct-name ")
+	b.WriteString(sourceStructName)
+	b.WriteString(" --interface-name ")
+	b.WriteString(interfaceName)
 	b.WriteString("\n")
 
 	// interface header

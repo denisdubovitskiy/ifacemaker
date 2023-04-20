@@ -28,3 +28,7 @@ func GOMODCACHE() string {
 	}
 	return filepath.Join(GOPATH(), "pkg", "mod")
 }
+
+func GOFILE() string {
+	return os.Getenv("GOFILE")
+}

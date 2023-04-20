@@ -29,6 +29,9 @@ tasks:
     deps: [binaries]
     cmds:
       - golangci-lint run {{ .ROOT_DIR }}/...
+  test:
+    cmds:
+      - go test -v {{ .ROOT_DIR }}/...
 
   imports:
     deps: [binaries]
