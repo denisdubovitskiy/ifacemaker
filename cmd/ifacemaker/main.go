@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/denisdubovitskiy/ifacemaker/internal/golang"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/denisdubovitskiy/ifacemaker/internal/generator"
+	"github.com/denisdubovitskiy/ifacemaker/internal/golang"
 	"github.com/denisdubovitskiy/ifacemaker/internal/gomodule"
 	"github.com/jessevdk/go-flags"
 	"github.com/spf13/afero"
