@@ -65,6 +65,7 @@ func main() {
 		InterfaceName:     args.InterfaceName,
 		ModulePath:        args.ModulePath,
 		SourcePackage:     args.SourcePackage,
+		OutputFilename:    args.OutputFileName,
 	})
 	if err != nil {
 		log.Fatal(err.Error())

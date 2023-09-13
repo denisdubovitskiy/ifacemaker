@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/jessevdk/go-flags v1.4.1-0.20181029123624-5de817a9aa20
+	github.com/jessevdk/go-flags v1.5.0
 	github.com/spf13/afero v1.9.5
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/tools v0.1.12
