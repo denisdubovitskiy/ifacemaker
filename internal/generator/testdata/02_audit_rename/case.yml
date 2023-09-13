@@ -2,6 +2,7 @@ module: "github.com/mattermost/mattermost-server/v5@v5.39.3"
 struct_name: "Audit"
 interface_name: "Audit2"
 out_package_name: "audit"
+output_filename: audit2.go
 files:
   - "github.com/mattermost/mattermost-server/v5@v5.39.3/model/access.go"
   - "github.com/mattermost/mattermost-server/v5@v5.39.3/model/analytics_row.go"

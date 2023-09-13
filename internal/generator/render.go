@@ -12,6 +12,7 @@ func RenderInterface(
 	sourceStructName string,
 	sourcePkgName string,
 	modulePath string,
+	outputFilename string,
 	receivers []Receiver,
 ) (
 	[]byte,
@@ -40,6 +41,8 @@ func RenderInterface(
 	b.WriteString(sourceStructName)
 	b.WriteString(" --interface-name ")
 	b.WriteString(interfaceName)
+	b.WriteString(" --output ")
+	b.WriteString(outputFilename)
 	b.WriteString("\n")
 
 	// interface header

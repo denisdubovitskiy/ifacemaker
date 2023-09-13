@@ -9,7 +9,6 @@ import (
 	"github.com/denisdubovitskiy/ifacemaker/internal/generator"
 	"github.com/denisdubovitskiy/ifacemaker/internal/golang"
 	"github.com/denisdubovitskiy/ifacemaker/internal/gomodule"
-	"github.com/jessevdk/go-flags"
 	"github.com/spf13/afero"
 )
 
@@ -65,6 +64,7 @@ func main() {
 		InterfaceName:     args.InterfaceName,
 		ModulePath:        args.ModulePath,
 		SourcePackage:     args.SourcePackage,
+		OutputFilename:    args.OutputFileName,
 	})
 	if err != nil {
 		log.Fatal(err.Error())

@@ -8,7 +8,8 @@ ifacemaker \
   --module-path model \
   --result-pkg client \
   --struct-name Client4 \
-  --interface-name Client4
+  --interface-name Client4 \
+  --output mattermost/client.go
 ```
 
 ### Parameters
@@ -19,3 +20,4 @@ ifacemaker \
 * `--result-pkg` - A name for the resulting package.
 * `--struct-name` - A name of the struct from which an interface should be generated.
 * `--interface-name` - A name for resulting interface.
+* `--output` - A filename in which a result interface is going to be stored.

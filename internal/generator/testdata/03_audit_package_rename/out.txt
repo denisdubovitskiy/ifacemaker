@@ -1,7 +1,7 @@
 // Package testpackage generated with github.com/denisdubovitskiy/ifacemaker, DO NOT EDIT.
 package testpackage
 
-//go:generate ifacemaker --source-pkg  --module-path  --result-pkg testpackage --struct-name Audit --interface-name Audit
+//go:generate ifacemaker --source-pkg  --module-path  --result-pkg testpackage --struct-name Audit --interface-name Audit --output testpackage.go
 type Audit interface {
 	ToJson() string
 }

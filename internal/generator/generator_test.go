@@ -16,6 +16,7 @@ type testCase struct {
 	StructName     string   `yaml:"struct_name"`
 	InterfaceName  string   `yaml:"interface_name"`
 	OutPackageName string   `yaml:"out_package_name"`
+	OutputFilename string   `yaml:"output_filename"`
 }
 
 func TestGenerate(t *testing.T) {
@@ -58,6 +59,7 @@ func TestGenerate(t *testing.T) {
 				StructName:        test.StructName,
 				InterfaceName:     test.InterfaceName,
 				OutputPackageName: test.OutPackageName,
+				OutputFilename:    test.OutputFilename,
 			})
 
 			// assert
