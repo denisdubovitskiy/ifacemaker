@@ -60,6 +60,7 @@ func TestGenerate(t *testing.T) {
 				InterfaceName:     test.InterfaceName,
 				OutputPackageName: test.OutPackageName,
 				OutputFilename:    test.OutputFilename,
+				GoGenerate:        true,
 			})
 
 			// assert

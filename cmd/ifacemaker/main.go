@@ -6,11 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jessevdk/go-flags"
+	"github.com/spf13/afero"
+
 	"github.com/denisdubovitskiy/ifacemaker/internal/generator"
 	"github.com/denisdubovitskiy/ifacemaker/internal/golang"
 	"github.com/denisdubovitskiy/ifacemaker/internal/gomodule"
-	"github.com/jessevdk/go-flags"
-	"github.com/spf13/afero"
 )
 
 type arguments struct {
@@ -21,6 +22,7 @@ type arguments struct {
 	StructName     string `short:"t" long:"struct-name" description:"A structure name to generate interface for" required:"true"`
 	InterfaceName  string `short:"i" long:"interface-name" description:"Name of the generated interface" required:"true"`
 	OutputFileName string `short:"o" long:"output" description:"OutputFileName file name"`
+	GoGenerate     bool   `short:"g" long:"go-generate" description:"Generate go:generate line"`
 }
 
 // ifacemaker \
@@ -66,6 +68,7 @@ func main() {
 		ModulePath:        args.ModulePath,
 		SourcePackage:     args.SourcePackage,
 		OutputFilename:    args.OutputFileName,
+		GoGenerate:        args.GoGenerate,
 	})
 	if err != nil {
 		log.Fatal(err.Error())

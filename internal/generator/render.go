@@ -13,6 +13,7 @@ func RenderInterface(
 	sourcePkgName string,
 	modulePath string,
 	outputFilename string,
+	writeGoGenerateCommand bool,
 	receivers []Receiver,
 ) (
 	[]byte,
@@ -30,20 +31,22 @@ func RenderInterface(
 	b.WriteString(packageName)
 	b.WriteString("\n")
 
-	b.WriteString("//go:generate ifacemaker")
-	b.WriteString(" --source-pkg ")
-	b.WriteString(sourcePkgName)
-	b.WriteString(" --module-path ")
-	b.WriteString(modulePath)
-	b.WriteString(" --result-pkg ")
-	b.WriteString(packageName)
-	b.WriteString(" --struct-name ")
-	b.WriteString(sourceStructName)
-	b.WriteString(" --interface-name ")
-	b.WriteString(interfaceName)
-	b.WriteString(" --output ")
-	b.WriteString(outputFilename)
-	b.WriteString("\n")
+	if writeGoGenerateCommand {
+		b.WriteString("//go:generate ifacemaker")
+		b.WriteString(" --source-pkg ")
+		b.WriteString(sourcePkgName)
+		b.WriteString(" --module-path ")
+		b.WriteString(modulePath)
+		b.WriteString(" --result-pkg ")
+		b.WriteString(packageName)
+		b.WriteString(" --struct-name ")
+		b.WriteString(sourceStructName)
+		b.WriteString(" --interface-name ")
+		b.WriteString(interfaceName)
+		b.WriteString(" --output ")
+		b.WriteString(outputFilename)
+		b.WriteString("\n")
+	}
 
 	// interface header
 	b.WriteString("type ")
