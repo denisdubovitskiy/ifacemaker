@@ -15,6 +15,7 @@ type Options struct {
 	ModulePath        string
 	SourcePackage     string
 	OutputFilename    string
+	GoGenerate        bool
 }
 
 func Generate(options Options) ([]byte, error) {
@@ -77,6 +78,7 @@ func Generate(options Options) ([]byte, error) {
 		options.SourcePackage,
 		options.ModulePath,
 		options.OutputFilename,
+		options.GoGenerate,
 		receivers,
 	)
 }
